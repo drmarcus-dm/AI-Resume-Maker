@@ -38,7 +38,7 @@
                 🌙
             </button>
             <span id="planBadge" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold hidden">PRO</span>
-            <button onclick="showPage('login')" class="btn-primary px-6 py-2 rounded-xl font-bold hidden sm:block">Sign In</button>
+            <button id="signInBtn" onclick="showPage('login')" class="btn-primary px-6 py-2 rounded-xl font-bold hidden sm:block">Sign In</button>
         </div>
     </header>
 
@@ -132,9 +132,9 @@
         <div class="glass w-full max-w-md p-8 rounded-2xl animate-fade">
             <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Create Account</h1>
             <form onsubmit="registerUser(event)">
-                <input type="text" id="regName" placeholder="Full Name" class="w-full p-4 mb-4 rounded-xl border" required>
-                <input type="email" id="regEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border" required>
-                <input type="password" id="regPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border" required>
+                <input type="text" id="regName" placeholder="Full Name" class="w-full p-4 mb-4 rounded-xl border border-gray-300" required>
+                <input type="email" id="regEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border border-gray-300" required>
+                <input type="password" id="regPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border border-gray-300" required>
                 <button type="submit" class="w-full btn-primary py-4 rounded-xl font-bold mb-4">Start Free</button>
                 <button type="button" onclick="showPage('login')" class="w-full text-blue-600 dark:text-blue-400">Have account? Sign In</button>
             </form>
@@ -146,8 +146,8 @@
         <div class="glass w-full max-w-md p-8 rounded-2xl animate-fade">
             <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Welcome Back</h1>
             <form onsubmit="loginUser(event)">
-                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border" required>
-                <input type="password" id="loginPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border" required>
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border border-gray-300" required>
+                <input type="password" id="loginPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border border-gray-300" required>
                 <button type="submit" class="w-full btn-primary py-4 rounded-xl font-bold mb-4">Sign In</button>
                 <button type="button" onclick="showPage('register')" class="w-full text-blue-600 dark:text-blue-400">Create Account</button>
             </form>
@@ -168,13 +168,13 @@
             <div class="grid lg:grid-cols-2 gap-8">
                 <!-- Form -->
                 <form onsubmit="generateResume(event)" class="glass rounded-2xl p-6 space-y-4">
-                    <input type="text" id="bName" placeholder="Full Name *" class="w-full p-4 rounded-xl border" required>
-                    <input type="text" id="bJob" placeholder="Target Job Title *" class="w-full p-4 rounded-xl border" required>
-                    <input type="text" id="bCompany" placeholder="Target Company" class="w-full p-4 rounded-xl border">
-                    <input type="number" id="bYears" placeholder="Years Experience" class="w-full p-4 rounded-xl border">
-                    <textarea id="bSkills" placeholder="Skills (React, Python, AWS...)" rows="3" class="w-full p-4 rounded-xl border"></textarea>
-                    <textarea id="bEdu" placeholder="Education (BS Computer Science)" rows="2" class="w-full p-4 rounded-xl border"></textarea>
-                    <textarea id="bExp" placeholder="Key Achievements" rows="4" class="w-full p-4 rounded-xl border"></textarea>
+                    <input type="text" id="bName" placeholder="Full Name *" class="w-full p-4 rounded-xl border border-gray-300" required>
+                    <input type="text" id="bJob" placeholder="Target Job Title *" class="w-full p-4 rounded-xl border border-gray-300" required>
+                    <input type="text" id="bCompany" placeholder="Target Company" class="w-full p-4 rounded-xl border border-gray-300">
+                    <input type="number" id="bYears" placeholder="Years Experience" class="w-full p-4 rounded-xl border border-gray-300">
+                    <textarea id="bSkills" placeholder="Skills (React, Python, AWS...)" rows="3" class="w-full p-4 rounded-xl border border-gray-300"></textarea>
+                    <textarea id="bEdu" placeholder="Education (BS Computer Science)" rows="2" class="w-full p-4 rounded-xl border border-gray-300"></textarea>
+                    <textarea id="bExp" placeholder="Key Achievements" rows="4" class="w-full p-4 rounded-xl border border-gray-300"></textarea>
                     <label class="flex items-center"><input type="checkbox" id="coverLetter" checked class="mr-2"> Include Cover Letter</label>
                     <button type="submit" id="generateBtn" class="w-full btn-primary py-4 rounded-xl font-bold">
                         🎯 Generate Pro Resume
@@ -224,7 +224,7 @@
                     <p class="text-gray-600 dark:text-gray-400">Downloads</p>
                 </div>
                 <div class="glass p-6 rounded-xl text-center">
-                    <div class="text-3xl font-bold text-purple-600" id="planStatus">Free</div>
+                    <div id="planStatus" class="text-3xl font-bold text-purple-600">Free</div>
                     <p class="text-gray-600 dark:text-gray-400">Plan</p>
                 </div>
                 <div class="glass p-6 rounded-xl text-center">
@@ -258,7 +258,7 @@
             document.getElementById(page).classList.remove('hidden');
             
             // Show/hide sign in button based on auth state
-            const signInBtn = document.querySelector('header button[onclick="showPage(\'login\')"]');
+            const signInBtn = document.getElementById('signInBtn');
             const badges = document.querySelectorAll('#planBadge, #planBadge2');
             
             if (localStorage.getItem('currentUser')) {
@@ -340,8 +340,6 @@
                 planStatus.textContent = 'Free';
                 planStatus.className = 'text-3xl font-bold text-purple-600';
             }
-            
-            showPage('home'); // Reset to home for badge visibility
         }
 
         // Upgrade Pro
@@ -425,7 +423,7 @@
                 document.getElementById('resumePreview').classList.remove('hidden');
                 document.getElementById('previewPlaceholder').classList.add('hidden');
                 
-                const resumeData = {...data, id: Date.now(), content: resume};
+                const resumeData = { ...data, id: Date.now(), content: resume };
                 resumes.push(resumeData);
                 localStorage.setItem('resumes', JSON.stringify(resumes));
                 
@@ -517,21 +515,24 @@
             if (resumes.length === 0) {
                 list.innerHTML = '<div class="text-center py-12"><div class="text-6xl mb-4">📁</div><p class="text-gray-600 dark:text-gray-400">Create your first pro resume!</p></div>';
             } else {
-                list.innerHTML = resumes.slice(-5).reverse().map(r => `
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-blue-600">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="font-bold text-gray-800 dark:text-white">${r.data.job || r.job}</h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(r.id).toLocaleDateString()}</p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <button onclick="copyToClipboard('${r.content.replace(/'/g, "\\'").replace(/`/g, "\\`")}')" 
-                                    class="text-blue-600 text-sm font-bold">Copy</button>
-                                ${isPro ? `<button onclick="downloadResumePdf('${r.id}')" class="text-green-600 text-sm font-bold">PDF</button>` : ''}
+                list.innerHTML = resumes.slice(-5).reverse().map(r => {
+                    const safeContent = r.content.replace(/'/g, "\\'").replace(/`/g, "\\`").replace(/\n/g, '\\n');
+                    return `
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-blue-600">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-800 dark:text-white">${r.job}</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(r.id).toLocaleDateString()}</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="copyToClipboard('${safeContent}')" 
+                                        class="text-blue-600 text-sm font-bold">Copy</button>
+                                    ${isPro ? `<button onclick="downloadResumePdf(${r.id})" class="text-green-600 text-sm font-bold">PDF</button>` : ''}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
@@ -539,6 +540,8 @@
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert('Copied to clipboard! 📋');
+            }).catch(() => {
+                alert('Copy failed!');
             });
         }
 
@@ -549,6 +552,10 @@
             // Temporarily populate preview
             document.getElementById('resumeText').textContent = resume.content;
             document.getElementById('resumePreview').classList.remove('hidden');
+            document.getElementById('previewPlaceholder').classList.add('hidden');
+            
+            // Update name for download
+            document.getElementById('bName').value = resume.name;
             
             setTimeout(async () => {
                 await downloadPdf();
@@ -567,6 +574,7 @@
             updateDashboard();
             showPage('dashboard');
         } else {
+            updateUI();
             showPage('home');
         }
     </script>
