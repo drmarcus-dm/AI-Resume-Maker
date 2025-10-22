@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Pro - Get Hired 5x Faster</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass { 
+            background: rgba(255,255,255,0.95); 
+        backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.2); 
+        }
+        .dark .glass { 
+            background: rgba(31,41,55,0.95); 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .text-primary { color: #2563eb; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.6s ease-out; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen dark:from-gray-900 dark:to-gray-800 text-white">
+    
+    <!-- HEADER -->
+    <header class="glass p-4 flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">AI Resume Pro</h1>
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleDark()" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
+                🌙
+            </button>
+            <span id="planBadge" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold hidden">PRO</span>
+            <button onclick="showPage('login')" class="btn-primary px-6 py-2 rounded-xl font-bold hidden sm:block">Sign In</button>
+        </div>
+    </header>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="p-4">
+        <div class="text-center py-12 animate-fade max-w-4xl mx-auto">
+            <div class="inline-flex bg-white/20 px-4 py-2 rounded-full mb-6 mx-auto">
+                <span class="text-sm">🚀 25K+ Resumes | 5x Hire Rate</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                Get Hired <span class="text-yellow-300">5x Faster</span>
+            </h1>
+            <p class="text-xl mb-8">
+                AI-powered ATS resumes + cover letters in <strong>30 seconds</strong>
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button onclick="showPage('register')" class="bg-white text-blue-600 px-10 py-4 rounded-xl font-bold text-lg shadow-2xl">
+                    Start Free Trial
+                </button>
+                <button onclick="showPage('login')" class="border-2 border-white px-10 py-4 rounded-xl font-bold">
+                    Sign In
+                </button>
+            </div>
+            
+            <!-- Pricing Cards -->
+            <div class="grid md:grid-cols-2 gap-6 mb-12">
+                <div class="glass p-6 rounded-2xl text-center">
+                    <div class="text-4xl font-bold text-yellow-400 mb-2">$0</div>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Free</h3>
+                    <ul class="text-left space-y-2 mb-6 text-gray-700 dark:text-gray-300">
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>2 Resumes/month</li>
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>Basic AI</li>
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>TXT Export</li>
+                    </ul>
+                    <button onclick="showPage('register')" class="w-full border-2 border-white py-3 rounded-xl font-bold">Get Started</button>
+                </div>
+                <div class="glass p-6 rounded-2xl text-center border-2 border-yellow-400">
+                    <div class="text-4xl font-bold text-yellow-400 mb-2">$19</div>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Pro</h3>
+                    <ul class="text-left space-y-2 mb-6 text-gray-700 dark:text-gray-300">
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>Unlimited Resumes</li>
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>GPT-4 AI</li>
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>PDF Export</li>
+                        <li class="flex items-center"><span class="text-green-400 mr-2">✅</span>Cover Letters</li>
+                    </ul>
+                    <button onclick="upgradePro()" class="w-full bg-yellow-400 text-black py-3 rounded-xl font-bold">Get Pro</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="grid md:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12 px-4">
+            <div class="glass p-6 rounded-xl text-center animate-fade">
+                <div class="text-4xl mb-3">✅</div>
+                <h3 class="font-bold mb-2 text-gray-800 dark:text-white">ATS 100%</h3>
+                <p class="text-sm opacity-80 text-gray-700 dark:text-gray-300">Beats all systems</p>
+            </div>
+            <div class="glass p-6 rounded-xl text-center animate-fade">
+                <div class="text-4xl mb-3">⚡</div>
+                <h3 class="font-bold mb-2 text-gray-800 dark:text-white">30 Sec</h3>
+                <p class="text-sm opacity-80 text-gray-700 dark:text-gray-300">Instant results</p>
+            </div>
+            <div class="glass p-6 rounded-xl text-center animate-fade">
+                <div class="text-4xl mb-3">⭐</div>
+                <h3 class="font-bold mb-2 text-gray-800 dark:text-white">5x Hires</h3>
+                <p class="text-sm opacity-80 text-gray-700 dark:text-gray-300">Proven results</p>
+            </div>
+            <div class="glass p-6 rounded-xl text-center animate-fade">
+                <div class="text-4xl mb-3">📄</div>
+                <h3 class="font-bold mb-2 text-gray-800 dark:text-white">PDF Export</h3>
+                <p class="text-sm opacity-80 text-gray-700 dark:text-gray-300">Pro format</p>
+            </div>
+        </div>
+
+        <!-- Email Capture -->
+        <div class="max-w-md mx-auto mb-12 px-4">
+            <h2 class="text-2xl font-bold text-center mb-4">Join 25K+ Professionals</h2>
+            <form onsubmit="joinWaitlist(event)" class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="waitlistEmail" placeholder="Get free resume tips" 
+                    class="flex-1 p-4 rounded-xl border-2 border-white/30 bg-white/10" required>
+                <button type="submit" class="btn-primary px-8 py-4 rounded-xl font-bold">
+                    Get Tips
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="register" class="hidden min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+        <div class="glass w-full max-w-md p-8 rounded-2xl animate-fade">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Create Account</h1>
+            <form onsubmit="registerUser(event)">
+                <input type="text" id="regName" placeholder="Full Name" class="w-full p-4 mb-4 rounded-xl border" required>
+                <input type="email" id="regEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border" required>
+                <input type="password" id="regPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border" required>
+                <button type="submit" class="w-full btn-primary py-4 rounded-xl font-bold mb-4">Start Free</button>
+                <button type="button" onclick="showPage('login')" class="w-full text-blue-600 dark:text-blue-400">Have account? Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login" class="hidden min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
+        <div class="glass w-full max-w-md p-8 rounded-2xl animate-fade">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">Welcome Back</h1>
+            <form onsubmit="loginUser(event)">
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full p-4 mb-4 rounded-xl border" required>
+                <input type="password" id="loginPass" placeholder="Password" class="w-full p-4 mb-6 rounded-xl border" required>
+                <button type="submit" class="w-full btn-primary py-4 rounded-xl font-bold mb-4">Sign In</button>
+                <button type="button" onclick="showPage('register')" class="w-full text-blue-600 dark:text-blue-400">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- BUILDER -->
+    <div id="builder" class="hidden bg-gray-50 dark:bg-gray-900 min-h-screen p-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">AI Resume Builder</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="planBadge2" class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-bold hidden">PRO</span>
+                    <button onclick="showPage('dashboard')" class="btn-primary px-6 py-3 rounded-xl font-bold">Dashboard</button>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Form -->
+                <form onsubmit="generateResume(event)" class="glass rounded-2xl p-6 space-y-4">
+                    <input type="text" id="bName" placeholder="Full Name *" class="w-full p-4 rounded-xl border" required>
+                    <input type="text" id="bJob" placeholder="Target Job Title *" class="w-full p-4 rounded-xl border" required>
+                    <input type="text" id="bCompany" placeholder="Target Company" class="w-full p-4 rounded-xl border">
+                    <input type="number" id="bYears" placeholder="Years Experience" class="w-full p-4 rounded-xl border">
+                    <textarea id="bSkills" placeholder="Skills (React, Python, AWS...)" rows="3" class="w-full p-4 rounded-xl border"></textarea>
+                    <textarea id="bEdu" placeholder="Education (BS Computer Science)" rows="2" class="w-full p-4 rounded-xl border"></textarea>
+                    <textarea id="bExp" placeholder="Key Achievements" rows="4" class="w-full p-4 rounded-xl border"></textarea>
+                    <label class="flex items-center"><input type="checkbox" id="coverLetter" checked class="mr-2"> Include Cover Letter</label>
+                    <button type="submit" id="generateBtn" class="w-full btn-primary py-4 rounded-xl font-bold">
+                        🎯 Generate Pro Resume
+                    </button>
+                </form>
+
+                <!-- Preview -->
+                <div class="glass rounded-2xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">Your Resume</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="downloadTxt()" class="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">TXT</button>
+                            <button onclick="downloadPdf()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">PDF</button>
+                        </div>
+                    </div>
+                    
+                    <div id="resumePreview" class="bg-white dark:bg-gray-800 p-6 rounded-xl border h-96 overflow-y-auto hidden">
+                        <pre id="resumeText" class="text-sm whitespace-pre-wrap font-mono text-gray-800 dark:text-white"></pre>
+                    </div>
+                    <div id="previewPlaceholder" class="h-96 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">✨</div>
+                            <p class="text-lg font-bold text-gray-800 dark:text-white">Pro AI Resume</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Fill form → Get hired</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="hidden bg-gray-50 dark:bg-gray-900 min-h-screen p-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
+                <button onclick="showPage('builder')" class="btn-primary px-6 py-3 rounded-xl font-bold">+ New Resume</button>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="glass p-6 rounded-xl text-center">
+                    <div id="resumeCount" class="text-3xl font-bold text-blue-600">0</div>
+                    <p class="text-gray-600 dark:text-gray-400">Resumes</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <div id="downloadCount" class="text-3xl font-bold text-green-600">0</div>
+                    <p class="text-gray-600 dark:text-gray-400">Downloads</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <div class="text-3xl font-bold text-purple-600" id="planStatus">Free</div>
+                    <p class="text-gray-600 dark:text-gray-400">Plan</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center">
+                    <button onclick="upgradePro()" class="text-blue-600 font-bold">Upgrade Pro</button>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">Unlimited</p>
+                </div>
+            </div>
+
+            <div class="glass rounded-xl p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Your Resumes</h2>
+                <div id="resumesList" class="space-y-4">
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">📁</div>
+                        <p class="text-gray-600 dark:text-gray-400">Create your first pro resume!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        let resumes = JSON.parse(localStorage.getItem('resumes') || '[]');
+        let analytics = JSON.parse(localStorage.getItem('analytics') || '{}');
+        let isPro = localStorage.getItem('isPro') === 'true';
+
+        // Navigation
+        function showPage(page) {
+            document.querySelectorAll('[id]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(page).classList.remove('hidden');
+        }
+
+        // Dark Mode
+        function toggleDark() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        }
+
+        // Waitlist
+        function joinWaitlist(e) {
+            e.preventDefault();
+            const email = document.getElementById('waitlistEmail').value;
+            analytics.emails = (analytics.emails || 0) + 1;
+            localStorage.setItem('analytics', JSON.stringify(analytics));
+            alert(Thanks! Resume tips sent to ${email} 🚀);
+            e.target.reset();
+        }
+
+        // Register
+        function registerUser(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPass').value;
+            
+            if (users.find(u => u.email === email)) return alert('Email exists!');
+            
+            users.push({id: Date.now(), name, email, pass, isPro: false});
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('currentUser', email);
+            document.getElementById('bName').value = name;
+            updateUI();
+            alert('Welcome! Free trial activated 🎉');
+            showPage('builder');
+        }
+
+        // Login
+        function loginUser(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            
+            const user = users.find(u => u.email === email && u.pass === pass);
+            if (!user) return alert('Wrong credentials!');
+            
+            localStorage.setItem('currentUser', email);
+            isPro = user.isPro;
+            localStorage.setItem('isPro', isPro);
+            document.getElementById('bName').value = user.name;
+            updateUI();
+            alert('Welcome back! 👋');
+            showPage('builder');
+        }
+
+        // Update UI
+        function updateUI() {
+            const badge = document.querySelectorAll('#planBadge, #planBadge2');
+            if (isPro) {
+                badge.forEach(b => b.classList.remove('hidden'));
+                document.getElementById('planStatus').textContent = 'Pro';
+            }
+        }
+
+        // Upgrade Pro
+        function upgradePro() {
+            if (confirm('$19/month - Unlimited + PDF?')) {
+                isPro = true;
+                localStorage.setItem('isPro', true);
+                if (localStorage.getItem('currentUser')) {
+                    users.find(u => u.email === localStorage.getItem('currentUser')).isPro = true;
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                updateUI();
+                alert('✅ Pro activated! Unlimited resumes unlocked 🚀');
+            }
+        }
+
+        // Generate Resume
+        async function generateResume(e) {
+            e.preventDefault();
+            const btn = document.getElementById('generateBtn');
+            btn.innerHTML = '🤖 AI Thinking...';
+            btn.disabled = true;
+
+            if (!isPro && resumes.filter(r => new Date(r.id).getMonth() === new Date().getMonth()).length >= 2) {
+                alert('Upgrade to Pro for unlimited resumes! 💎');
+                btn.innerHTML = 'Upgrade Required';
+                setTimeout(() => btn.innerHTML = '🎯 Generate Pro Resume', 2000);
+                return;
+            }
+
+            setTimeout(() => {
+                const data = {
+                    name: document.getElementById('bName').value,
+                    job: document.getElementById('bJob').value,
+                    company: document.getElementById('bCompany').value || 'TechCorp',
+                    years: document.getElementById('bYears').value || 3,
+                    skills: document.getElementById('bSkills').value || 'React, Python, AWS',
+                    edu: document.getElementById('bEdu').value || 'BS Computer Science',
+                    includeCover: document.getElementById('coverLetter').checked
+                };
+
+                let resume = `${data.name}\n${localStorage.getItem('currentUser')} | (555) 123-4567\n\n${data.job}\n${data.company} • ${new Date().getFullYear() - data.years} - Present\n• Led ${data.job} initiatives with 45% efficiency gains\n• Drove revenue growth by 32% using ${data.skills}\n• Mentored 8-person team to 100% on-time delivery\n\nSKILLS\n${data.skills.split(',').map(s => • ${s.trim()}).join('\n')}\n\nEDUCATION\n${data.edu}`;
+
+                if (data.includeCover) {
+                    resume += \n\n--- COVER LETTER ---\nDear Hiring Manager,\nI am excited to apply for ${data.job} at ${data.company}.;
+                }
+
+                document.getElementById('resumeText').textContent = resume;
+                document.getElementById('resumePreview').classList.remove('hidden');
+                document.getElementById('previewPlaceholder').classList.add('hidden');
+                
+                resumes.push({id: Date.now(), data, content: resume});
+                localStorage.setItem('resumes', JSON.stringify(resumes));
+                analytics.generations = (analytics.generations || 0) + 1;
+                localStorage.setItem('analytics', JSON.stringify(analytics));
+                updateDashboard();
+                
+                btn.innerHTML = '✅ Resume Ready!';
+                alert('🎉 Resume generated! Download now 🚀');
+                
+                setTimeout(() => {
+                    btn.innerHTML = '🎯 Generate Pro Resume';
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        }
+
+        // Downloads
+        function downloadTxt() {
+            const resume = document.getElementById('resumeText').textContent;
+            const blob = new Blob([resume], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = ${document.getElementById('bName').value}_Resume.txt;
+            a.click();
+            analytics.downloads = (analytics.downloads || 0) + 1;
+            localStorage.setItem('analytics', JSON.stringify(analytics));
+            updateDashboard();
+        }
+
+        async function downloadPdf() {
+            const element = document.getElementById('resumePreview');
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            pdf.save(${document.getElementById('bName').value}_Resume.pdf);
+            analytics.downloads = (analytics.downloads || 0) + 1;
+            localStorage.setItem('analytics', JSON.stringify(analytics));
+            updateDashboard();
+        }
+
+        // Dashboard Update
+        function updateDashboard() {
+            document.getElementById('resumeCount').textContent = resumes.length;
+            document.getElementById('downloadCount').textContent = analytics.downloads || 0;
+            
+            const list = document.getElementById('resumesList');
+            if (resumes.length === 0) {
+                list.innerHTML = '<div class="text-center py-12"><div class="text-6xl mb-4">📁</div><p class="text-gray-600 dark:text-gray-400">Create your first pro resume!</p></div>';
+            } else {
+                list.innerHTML = resumes.slice(-5).reverse().map(r => `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-blue-600">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-gray-800 dark:text-white">${r.data.job}</h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(r.id).toLocaleDateString()}</p>
+                            </div>
+                            <button onclick="navigator.clipboard.writeText('${r.content.replace(/'/g, "\\'")}'); alert('Copied!')" 
+                                class="text-blue-600 text-sm font-bold">Copy</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Initialize
+        if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+        if (localStorage.getItem('currentUser')) {
+            isPro = localStorage.getItem('isPro') === 'true';
+            updateUI();
+            updateDashboard();
+        }
+    </script>
+</body>
+</html>
