@@ -13,7 +13,7 @@
         body { font-family: 'Inter', sans-serif; }
         .glass { 
             background: rgba(255,255,255,0.95); 
-        backdrop-filter: blur(20px); 
+            backdrop-filter: blur(20px); 
             border: 1px solid rgba(255,255,255,0.2); 
         }
         .dark .glass { 
@@ -25,6 +25,7 @@
         .text-primary { color: #2563eb; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade { animation: fadeIn 0.6s ease-out; }
+        pre { white-space: pre-wrap; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-600 to-purple-700 min-h-screen dark:from-gray-900 dark:to-gray-800 text-white">
@@ -255,6 +256,18 @@
         function showPage(page) {
             document.querySelectorAll('[id]').forEach(el => el.classList.add('hidden'));
             document.getElementById(page).classList.remove('hidden');
+            
+            // Show/hide sign in button based on auth state
+            const signInBtn = document.querySelector('header button[onclick="showPage(\'login\')"]');
+            const badges = document.querySelectorAll('#planBadge, #planBadge2');
+            
+            if (localStorage.getItem('currentUser')) {
+                signInBtn.classList.add('hidden');
+                badges.forEach(b => b.classList.remove('hidden'));
+            } else {
+                signInBtn.classList.remove('hidden');
+                badges.forEach(b => b.classList.add('hidden'));
+            }
         }
 
         // Dark Mode
@@ -269,7 +282,7 @@
             const email = document.getElementById('waitlistEmail').value;
             analytics.emails = (analytics.emails || 0) + 1;
             localStorage.setItem('analytics', JSON.stringify(analytics));
-            alert(Thanks! Resume tips sent to ${email} 🚀);
+            alert(`Thanks! Resume tips sent to ${email} 🚀`);
             e.target.reset();
         }
 
@@ -285,6 +298,9 @@
             users.push({id: Date.now(), name, email, pass, isPro: false});
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('currentUser', email);
+            localStorage.setItem('isPro', 'false');
+            isPro = false;
+            
             document.getElementById('bName').value = name;
             updateUI();
             alert('Welcome! Free trial activated 🎉');
@@ -303,6 +319,7 @@
             localStorage.setItem('currentUser', email);
             isPro = user.isPro;
             localStorage.setItem('isPro', isPro);
+            
             document.getElementById('bName').value = user.name;
             updateUI();
             alert('Welcome back! 👋');
@@ -311,21 +328,35 @@
 
         // Update UI
         function updateUI() {
-            const badge = document.querySelectorAll('#planBadge, #planBadge2');
+            const badges = document.querySelectorAll('#planBadge, #planBadge2');
+            const planStatus = document.getElementById('planStatus');
+            
             if (isPro) {
-                badge.forEach(b => b.classList.remove('hidden'));
-                document.getElementById('planStatus').textContent = 'Pro';
+                badges.forEach(b => b.classList.remove('hidden'));
+                planStatus.textContent = 'Pro';
+                planStatus.className = 'text-3xl font-bold text-green-600';
+            } else {
+                badges.forEach(b => b.classList.add('hidden'));
+                planStatus.textContent = 'Free';
+                planStatus.className = 'text-3xl font-bold text-purple-600';
             }
+            
+            showPage('home'); // Reset to home for badge visibility
         }
 
         // Upgrade Pro
         function upgradePro() {
             if (confirm('$19/month - Unlimited + PDF?')) {
                 isPro = true;
-                localStorage.setItem('isPro', true);
-                if (localStorage.getItem('currentUser')) {
-                    users.find(u => u.email === localStorage.getItem('currentUser')).isPro = true;
-                    localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('isPro', 'true');
+                
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    const user = users.find(u => u.email === currentUser);
+                    if (user) {
+                        user.isPro = true;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
                 }
                 updateUI();
                 alert('✅ Pro activated! Unlimited resumes unlocked 🚀');
@@ -339,11 +370,21 @@
             btn.innerHTML = '🤖 AI Thinking...';
             btn.disabled = true;
 
-            if (!isPro && resumes.filter(r => new Date(r.id).getMonth() === new Date().getMonth()).length >= 2) {
-                alert('Upgrade to Pro for unlimited resumes! 💎');
-                btn.innerHTML = 'Upgrade Required';
-                setTimeout(() => btn.innerHTML = '🎯 Generate Pro Resume', 2000);
-                return;
+            // Free plan limit check
+            if (!isPro) {
+                const currentMonthResumes = resumes.filter(r => {
+                    const resumeDate = new Date(r.id);
+                    const now = new Date();
+                    return resumeDate.getFullYear() === now.getFullYear() && 
+                           resumeDate.getMonth() === now.getMonth();
+                }).length;
+                
+                if (currentMonthResumes >= 2) {
+                    alert('Upgrade to Pro for unlimited resumes! 💎');
+                    btn.innerHTML = '🎯 Generate Pro Resume';
+                    btn.disabled = false;
+                    return;
+                }
             }
 
             setTimeout(() => {
@@ -351,28 +392,47 @@
                     name: document.getElementById('bName').value,
                     job: document.getElementById('bJob').value,
                     company: document.getElementById('bCompany').value || 'TechCorp',
-                    years: document.getElementById('bYears').value || 3,
+                    years: parseInt(document.getElementById('bYears').value) || 3,
                     skills: document.getElementById('bSkills').value || 'React, Python, AWS',
                     edu: document.getElementById('bEdu').value || 'BS Computer Science',
+                    exp: document.getElementById('bExp').value || '',
                     includeCover: document.getElementById('coverLetter').checked
                 };
 
-                let resume = `${data.name}\n${localStorage.getItem('currentUser')} | (555) 123-4567\n\n${data.job}\n${data.company} • ${new Date().getFullYear() - data.years} - Present\n• Led ${data.job} initiatives with 45% efficiency gains\n• Drove revenue growth by 32% using ${data.skills}\n• Mentored 8-person team to 100% on-time delivery\n\nSKILLS\n${data.skills.split(',').map(s => • ${s.trim()}).join('\n')}\n\nEDUCATION\n${data.edu}`;
+                let resume = `${data.name}\n${localStorage.getItem('currentUser')} | (555) 123-4567\n\n`;
+                resume += `${data.job}\n${data.company} • ${new Date().getFullYear() - data.years} - Present\n`;
+                
+                if (data.exp) {
+                    resume += `• ${data.exp}\n`;
+                }
+                resume += `• Led ${data.job} initiatives with 45% efficiency gains\n`;
+                resume += `• Drove revenue growth by 32% using ${data.skills}\n`;
+                resume += `• Mentored 8-person team to 100% on-time delivery\n\n`;
+
+                resume += `SKILLS\n${data.skills.split(',').map(s => `• ${s.trim()}`).join('\n')}\n\n`;
+
+                resume += `EDUCATION\n${data.edu}`;
 
                 if (data.includeCover) {
-                    resume += \n\n--- COVER LETTER ---\nDear Hiring Manager,\nI am excited to apply for ${data.job} at ${data.company}.;
+                    resume += `\n\n--- COVER LETTER ---\nDear Hiring Manager,\n\n`;
+                    resume += `I am excited to apply for the ${data.job} position at ${data.company}. `;
+                    resume += `With ${data.years} years of experience and expertise in ${data.skills}, `;
+                    resume += `I am confident I can make an immediate impact on your team.\n\n`;
+                    resume += `Best regards,\n${data.name}`;
                 }
 
                 document.getElementById('resumeText').textContent = resume;
                 document.getElementById('resumePreview').classList.remove('hidden');
                 document.getElementById('previewPlaceholder').classList.add('hidden');
                 
-                resumes.push({id: Date.now(), data, content: resume});
+                const resumeData = {...data, id: Date.now(), content: resume};
+                resumes.push(resumeData);
                 localStorage.setItem('resumes', JSON.stringify(resumes));
+                
                 analytics.generations = (analytics.generations || 0) + 1;
                 localStorage.setItem('analytics', JSON.stringify(analytics));
-                updateDashboard();
                 
+                updateDashboard();
                 btn.innerHTML = '✅ Resume Ready!';
                 alert('🎉 Resume generated! Download now 🚀');
                 
@@ -386,43 +446,66 @@
         // Downloads
         function downloadTxt() {
             const resume = document.getElementById('resumeText').textContent;
+            const name = document.getElementById('bName').value;
             const blob = new Blob([resume], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = ${document.getElementById('bName').value}_Resume.txt;
+            a.download = `${name}_Resume.txt`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
             analytics.downloads = (analytics.downloads || 0) + 1;
             localStorage.setItem('analytics', JSON.stringify(analytics));
             updateDashboard();
         }
 
         async function downloadPdf() {
+            if (!isPro) {
+                alert('PDF export requires Pro plan! 💎');
+                return;
+            }
+            
             const element = document.getElementById('resumePreview');
-            const canvas = await html2canvas(element, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            const imgWidth = 210;
-            const pageHeight = 295;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 0;
+            const name = document.getElementById('bName').value;
+            
+            try {
+                const canvas = await html2canvas(element, { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true
+                });
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
 
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
-            }
 
-            pdf.save(${document.getElementById('bName').value}_Resume.pdf);
-            analytics.downloads = (analytics.downloads || 0) + 1;
-            localStorage.setItem('analytics', JSON.stringify(analytics));
-            updateDashboard();
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save(`${name}_Resume.pdf`);
+                
+                analytics.downloads = (analytics.downloads || 0) + 1;
+                localStorage.setItem('analytics', JSON.stringify(analytics));
+                updateDashboard();
+            } catch (error) {
+                alert('PDF generation failed. Please try TXT download.');
+                console.error('PDF Error:', error);
+            }
         }
 
         // Dashboard Update
@@ -438,23 +521,53 @@
                     <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border-l-4 border-blue-600">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h3 class="font-bold text-gray-800 dark:text-white">${r.data.job}</h3>
+                                <h3 class="font-bold text-gray-800 dark:text-white">${r.data.job || r.job}</h3>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">${new Date(r.id).toLocaleDateString()}</p>
                             </div>
-                            <button onclick="navigator.clipboard.writeText('${r.content.replace(/'/g, "\\'")}'); alert('Copied!')" 
-                                class="text-blue-600 text-sm font-bold">Copy</button>
+                            <div class="flex space-x-2">
+                                <button onclick="copyToClipboard('${r.content.replace(/'/g, "\\'").replace(/`/g, "\\`")}')" 
+                                    class="text-blue-600 text-sm font-bold">Copy</button>
+                                ${isPro ? `<button onclick="downloadResumePdf('${r.id}')" class="text-green-600 text-sm font-bold">PDF</button>` : ''}
+                            </div>
                         </div>
                     </div>
                 `).join('');
             }
         }
 
+        // Helper functions
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard! 📋');
+            });
+        }
+
+        async function downloadResumePdf(resumeId) {
+            const resume = resumes.find(r => r.id == resumeId);
+            if (!resume) return;
+            
+            // Temporarily populate preview
+            document.getElementById('resumeText').textContent = resume.content;
+            document.getElementById('resumePreview').classList.remove('hidden');
+            
+            setTimeout(async () => {
+                await downloadPdf();
+                showPage('dashboard');
+            }, 100);
+        }
+
         // Initialize
-        if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+        
         if (localStorage.getItem('currentUser')) {
             isPro = localStorage.getItem('isPro') === 'true';
             updateUI();
             updateDashboard();
+            showPage('dashboard');
+        } else {
+            showPage('home');
         }
     </script>
 </body>
